@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Monitore o preço de produtos da Amazon e defina o valor que você quer pagar." />
+  <meta name="color-scheme" content="dark" />
+  <title>Monitor de Preços</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Manrope:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* ---------- Tokens ---------- */
+    :root {
+      --bg: #0d1218;
+      --surface: #151c25;
+      --surface-raised: #1b2430;
+      --border: #263140;
+      --text: #e8edf3;
+      --text-muted: #8f9db0;
+      --accent: #ffb547;
+      --accent-strong: #ffc46b;
+      --on-accent: #1a1205;
+      --success: #4cd6a0;
+      --danger: #ff7a7a;
+
+      --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+      --font-body: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+      --radius-card: 20px;
+      --radius-field: 12px;
+    }
+
+    /* ---------- Base ---------- */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: clamp(2rem, 8vh, 5rem) 1.25rem 3rem;
+      background:
+        radial-gradient(900px 420px at 50% -10%, rgba(255, 181, 71, 0.08), transparent 70%),
+        var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    /* ---------- Header ---------- */
+    .site-header {
+      width: 100%;
+      max-width: 520px;
+      margin-bottom: 2rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .brand-mark {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      color: var(--accent);
+    }
+
+    .site-header h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(2rem, 6vw, 2.75rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .site-header p {
+      margin: 0;
+      max-width: 44ch;
+      color: var(--text-muted);
+    }
+
+    /* ---------- Card / formulário ---------- */
+    main {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .card {
+      padding: clamp(1.25rem, 4vw, 2rem);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7);
+    }
+
+    .field + .field {
+      margin-top: 1.25rem;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 0.45rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-field);
+      font: inherit;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .field input::placeholder {
+      color: #5c6a7d;
+    }
+
+    .field input:hover {
+      border-color: #34445a;
+    }
+
+    .field input:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(255, 181, 71, 0.18);
+    }
+
+    .btn-submit {
+      width: 100%;
+      margin-top: 1.75rem;
+      padding: 0.95rem 1.25rem;
+      background: var(--accent);
+      color: var(--on-accent);
+      border: 0;
+      border-radius: var(--radius-field);
+      font: inherit;
+      font-weight: 700;
+      font-size: 1.02rem;
+      cursor: pointer;
+      box-shadow: 0 10px 24px -12px rgba(255, 181, 71, 0.7);
+      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+    }
+
+    .btn-submit:hover {
+      background: var(--accent-strong);
+    }
+
+    .btn-submit:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 12px -8px rgba(255, 181, 71, 0.7);
+    }
+
+    .btn-submit:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 3px;
+    }
+
+    /* ---------- Status ---------- */
+    .status {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      min-height: 3.2rem;
+      display: flex;
+      align-items: center;
+      background: transparent;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-field);
+      color: var(--text-muted);
+      font-size: 0.93rem;
+    }
+
+    /* Estados prontos para quando o servidor responder */
+    .status.is-success {
+      border-style: solid;
+      border-color: rgba(76, 214, 160, 0.45);
+      background: rgba(76, 214, 160, 0.08);
+      color: var(--success);
+    }
+
+    .status.is-error {
+      border-style: solid;
+      border-color: rgba(255, 122, 122, 0.45);
+      background: rgba(255, 122, 122, 0.08);
+      color: var(--danger);
+    }
+
+    /* ---------- Responsivo / acessibilidade ---------- */
+    @media (max-width: 400px) {
+      body {
+        padding-inline: 1rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 7 9 13 13 9 21 17" />
+          <polyline points="15 17 21 17 21 11" />
+        </svg>
+      </span>
+      <h1>Monitor de Preços</h1>
+    </div>
+    <p>Informe um produto da Amazon e o preço que você quer pagar.</p>
+  </header>
+
+  <main>
+    <form id="price-form" class="card">
+      <div class="field">
+        <label for="product-url">Link do Produto (Amazon)</label>
+        <input
+          type="url"
+          id="product-url"
+          name="productUrl"
+          placeholder="https://www.amazon.com.br/dp/..."
+          autocomplete="off"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <label for="target-price">Preço Alvo (R$)</label>
+        <input
+          type="number"
+          id="target-price"
+          name="targetPrice"
+          placeholder="199,90"
+          min="0.01"
+          step="0.01"
+          inputmode="decimal"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn-submit">Iniciar Monitoramento</button>
+    </form>
+
+    <div id="status" class="status" role="status" aria-live="polite">
+      As respostas do servidor aparecerão aqui.
+    </div>
+  </main>
+
+  <script>
+    document.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Impede a página de recarregar
+    
+    // Pegar os valores que o utilizador digitou
+    const linkInput = document.querySelector('input[type="url"], input[id*="link"]').value;
+    const precoInput = document.querySelector('input[type="number"], input[id*="preco"]').value;
+    
+    const divStatus = document.getElementById('status') || document.querySelector('.status');
+    divStatus.innerHTML = "A verificar o preço na Amazon...";
+    divStatus.style.color = "yellow";
+
+    try {
+        // Faz o pedido (fetch) ao Python
+        const resposta = await fetch('/api/monitorar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ link: linkInput, preco_alvo: parseFloat(precoInput) })
+        });
+        
+        const resultado = await resposta.json();
+        
+        // Exibe a resposta do Python na tela
+        divStatus.innerHTML = resultado.mensagem;
+        divStatus.style.color = resultado.status === 'erro' ? 'red' : 'green';
+        
+    } catch (erro) {
+        divStatus.innerHTML = "Erro ao contactar o servidor.";
+        divStatus.style.color = "red";
+    }
+});
+  </script>
+</body>
+</html>
